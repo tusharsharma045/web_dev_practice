@@ -19,10 +19,17 @@
 // // console.log(greet("Raja"));
 // // console.log(greet("John"));
 
-// // function sum(a, b) {
-// //     let totalsum = a + b
-// //     return totalsum
-// // }
+
+function greet(a,b,op) {
+    return op(a,b)
+}
+function sum(a, b) {
+    // let totalsum = a + b
+    return a+b
+}
+
+
+console.log(greet(10, 20, sum))
 
 // // let ans = sum(10, 20)
 // // let ans2 = sum(30, 40)
