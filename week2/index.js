@@ -114,3 +114,30 @@
 // p.then(main);
 
 // create a promisfied verified of version of fs.readfile, fs.writefile, cleanfile
+
+
+const fs = require('fs')
+ function readthefile(sendthedata ){
+    fs.readFile("a.txt" , "utf 8" , function (err,data) {
+        sendthedata(data)
+        
+    })
+ }
+
+
+ function readFile(filename) {
+
+// read the file and returnns its value
+    return new Promise(readthefile);
+    
+ }
+
+ const p = readFile()
+
+ function callback(contents) {
+
+    console.log(contents);
+    
+ }
+
+ p.then(callback)
