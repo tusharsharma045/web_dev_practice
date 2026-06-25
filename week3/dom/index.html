@@ -1,0 +1,160 @@
+<!-- <html>
+<body>
+    <input type="text">
+    <button onclick="ADDtodo()">addTODO</button>
+
+</body>
+<script>
+
+function ADDtodo() {
+     
+
+const value = document.querySelector("input").value
+
+const spanEL = document.createElement('span');
+const buttonEL = document.createElement('button');
+
+spanEL.innerHTML = value;
+buttonEL.innerHTML = "delete ";
+
+
+
+const newdivEL = document.createElement('div');
+
+newdivEL.appendChild(spanEL);
+newdivEL.appendChild(buttonEL);
+
+newdivEL.innerHTML = "<div>"+ value + "</div><button>Delete</button>";
+document.querySelector('body').appendChild(newdivEL)
+}
+</script>
+
+
+</html>  -->
+
+
+<!-- /to do  app -->
+
+<!-- <html><!DOCTYPE html>
+<html>
+<body>
+    <input type="text" id="inp">
+    <button onclick="addTodo()">Add Todo</button>
+
+    <div id="todos"></div>
+
+    <script>
+        let todos = [];
+
+        function addTodo() {
+            const value = document.querySelector("#inp").value;
+
+            todos.push({
+                title: value
+            });
+
+            render();
+            document.querySelector("#inp").value = "";
+        }
+
+        function render() {
+            document.querySelector("#todos").innerHTML = "";
+
+            for (let i = 0; i < todos.length; i++) {
+                const todo = todos[i];
+
+                const div = document.createElement("div");
+                const h1 = document.createElement("h1");
+                const button = document.createElement("button");
+
+                h1.innerHTML = todo.title;
+                button.innerHTML = "Delete";
+
+                button.onclick = function () {
+                    todos.splice(i, 1);
+                    render();
+                };
+
+                div.appendChild(h1);
+                div.appendChild(button);
+
+                document.querySelector("#todos").appendChild(div);
+            }
+        }
+    </script>
+</body>
+</html> -->
+
+
+<!--  delete todos by splice -->
+
+<html>
+
+<body>
+    <input type="text">
+    <button  onclick="ADDTODO">add to do</button>
+    <button onclick="deletefirsttodo">delete first to do</button>
+    <button onclick="deletelasttodo">delete last todo</button>
+    <div id="TODOS"></div>
+</body>
+
+<script>
+
+let todos = [];
+
+        function addTodo() {
+            const value = document.querySelector("#inp").value;
+
+            todos.push({
+                title: value
+            });
+
+            render();
+            document.querySelector("#inp").value = "";
+        }
+
+        function deletelasttodo() {
+
+            todos.splice(todos.length-1,1);
+
+            render();
+        }
+        function deletefirsttodo() {
+            todos.splice(0,1);
+            
+            render();
+        }
+
+        function createTodoElement(todo) {
+        
+            const div = document.createElement("div");
+            const h1 = document.createElement("h1");
+            const button = document.createElement("button");
+            button.innerHTML = "Delete";
+            h1.innerHTML = todo.title;
+            div.appendChild(h1);
+            div.appendChild(button);
+
+            return div;
+        }
+
+        function render() {
+            document.querySelector("#TODOS").innerHTML = "";
+
+            for (let i = 0; i < todos.length; i++) {
+                const element = createTodoElement(todos[i]);
+                document.querySelector("#TODOS").appendChild(element);
+            }
+        }
+
+        function render() {
+            document.querySelector("#TODOS").innerHTML = "";
+
+            for (let i = 0; i < todos.length; i++) {
+                const element = createTodoElement(todos[i]);
+                document.querySelector("#TODOS").appendChild(element);
+            }
+        }
+    </script>
+
+</html>
