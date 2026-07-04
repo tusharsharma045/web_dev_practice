@@ -1,0 +1,24 @@
+<head>
+        <script src="https://unpkg.com/axios@<x.x.x>/dist/axios.min.js"></script>
+
+<script>
+    function sendrequest(){
+        const a = document.getElementById('a').value
+        const b = document.getElementById('b').value
+
+        axios.post("https://localhost:3000/sum",{
+            a : a,
+            b : b
+        })
+    }
+</script>
+
+</head>
+<body>
+    <input type="text" id="a" placeholder="firstvalue">
+    <input type="text" id="b" placeholder="secondvalue">
+<button onclick="sendrequest()">find sum</button>
+
+</body>
+
+ <!-- app.use(cors()is ussed for cross orgin of websites like : google.com to  the employee/google.com) -->
