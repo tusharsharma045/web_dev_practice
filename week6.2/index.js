@@ -9,7 +9,20 @@ const JWT_SECRET = "HARKIRATSINGHBASSI";
 
 const users = [];
 
-app.post("/signup", (req, res) => {
+function logger(req,res,next){
+    console.log("req.method + request came")
+    next();
+}
+
+app.get("/",function(req , res){
+    res.sendFile(__dirname+"/frontend/index.html")
+});
+app.get("/signup",function(req , res){
+    res.sendFile(__dirname+"/frontend/signup.html")
+}); 
+
+
+app.post("/signup",logger, (req, res) => {
     const { username, password } = req.body;
 
     users.push({
@@ -22,7 +35,7 @@ app.post("/signup", (req, res) => {
     });
 });
 
-app.post("/signin", (req, res) => {
+app.post("/signin",logger, (req, res) => {
     const { username, password } = req.body;
 
     let foundUser = null;
@@ -50,34 +63,54 @@ app.post("/signin", (req, res) => {
     });
 });
 
-app.get("/me", (req, res) => {
-    const token = req.headers.token;
+function auth(req,res,next){
+    
+const token = req.header.token
+const decodedData = jwt.verify(token , JWT_SECRET)  
+    if (decodedData.username) {
+        req.username = decodedData.username
+        
+    
+    next()
+}
 
-    try {
-        const decodedData = jwt.verify(token, JWT_SECRET);
+else{
+    res.json({
+        message: "you  are not logged in"
+    })
+    
+}
 
-        let foundUser = null;
+    
+} 
+
+app.get("/me",auth, (req, res) => {
+    
 
         for (let i = 0; i < users.length; i++) {
-            if (users[i].username === decodedData.username) {
+            if (users[i].username === req.username) {
                 foundUser = users[i];
                 break;
             }
         }
 
-        if (!foundUser) {
-            return res.status(404).json({
-                message: "User not found"
-            });
-        }
+        res.json({
+            username: foundUser.username,
+            password: foundUser.password
+        })
+    });
 
-        res.json(foundUser);
-    } catch (err) {
-        res.status(401).json({
-            message: "Invalid token"
-        });
-    }
-});
+    app.get("/todo",auth,function (req,res) {
+        
+    });
+
+    app.post("/todo",auth,function (req,res) {
+        
+    });
+
+    app.delete("/todo",auth,function (req,res){
+
+    });
 
 app.listen(3000, () => {
     console.log("Server running on port 3000");
