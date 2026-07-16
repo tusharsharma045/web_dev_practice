@@ -1,104 +1,147 @@
-const express = require('express');
-const { usermodel, todomodel } = require("./db.js");
-const app = express();
-//  monngoose.connect("");
+const express = require("express");
+const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const { usermodel, todomodel } = require("./db");
+
+const app = express();
+
+app.use(express.json());
+
 const JWT_SECRET = "harkirat";
 
-app.post("/signup",async ,function(req,res){
+mongoose
+  .connect("mongodb://root:example@localhost:27017/todo?authSource=admin")
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log(err));
 
-    const email = req.body.email;
-    const password = req.body.password;
-    const name = req.body.name;
+// ================= Signup =================
 
-    app.use(express.json());
+app.post("/signup", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    const existingUser = await usermodel.findOne({ email });
+
+    if (existingUser) {
+      return res.status(400).json({
+        message: "User already exists",
+      });
+    }
 
     await usermodel.create({
-        name : "harkirat",
-        Email : "wwefrffgbv@gmail.com",
-        password : "123456"
-    })
-
-    res.json({
-        message : "you have logged in"
-    })
-});
-
-app.post("/signin",async,function(req,res){
-
-    const email = req.body.email;
-    const password = req.body.email;
-
-    const user = await usermodel.findone({
-        email : email,
-        password: password
-    })
-
-    if (user) {
-        console.log({
-            id : user._id.toString()
-        });
-        const token = jwt.sign({
-    id : user._id.toString()
-        },JWT_SECRET);
-
-        res.json({
-            message : token
-        });
-
-    }else{
-        res.status(403).json({
-            message : "invalid Credential"
-        })
-    }
-});
-
-app.post("/todo",auth,function(req,res){
-    const userId = req.userId;
-    const tittle = req.body.tittle;
-    todomodel.create({
-        title : tittle,
-        userId : userId
-    });
-    res.json({
-        userId : userId
-    })
-
-});
-
-app.get("/todos",auth,function(req,res){
-    const userId = req.userId;
-    const todos = todomodel.find({
-        userId : userId
+      name,
+      email,
+      password,
     });
 
     res.json({
-        userId : userId,
-        todos : todos
+      message: "User created successfully",
     });
-
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
 });
 
+// ================= Signin =================
 
+app.post("/signin", async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
+    const user = await usermodel.findOne({
+      email,
+      password,
+    });
 
-function auth(req,res,next){
-
-    const token = req.headers.token;
-
-    const decodeddata = jwt.verify({token,JWT_SECRET})
-
-    if (decodeddata) {
-        req.userId = decodeddata.id;
-        next();
-    }else{
-        res.status(403).json({
-            message : "invalid credentials"
-        });
+    if (!user) {
+      return res.status(403).json({
+        message: "Invalid credentials",
+      });
     }
 
-};
+    const token = jwt.sign(
+      {
+        id: user._id.toString(),
+      },
+      JWT_SECRET
+    );
 
+    res.json({
+      token,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
 
-app.listen(3000);
+// ================= Auth Middleware =================
 
+function auth(req, res, next) {
+  const token = req.headers.token;
+
+  if (!token) {
+    return res.status(401).json({
+      message: "Token required",
+    });
+  }
+
+  try {
+    const decodedData = jwt.verify(token, JWT_SECRET);
+
+    req.userId = decodedData.id;
+
+    next();
+  } catch (err) {
+    res.status(403).json({
+      message: "Invalid token",
+    });
+  }
+}
+
+// ================= Create Todo =================
+
+app.post("/todo", auth, async (req, res) => {
+  try {
+    const { title } = req.body;
+
+    await todomodel.create({
+      title,
+      done: false,
+      userId: req.userId,
+    });
+
+    res.json({
+      message: "Todo created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+
+// ================= Get Todos =================
+
+app.get("/todos", auth, async (req, res) => {
+  try {
+    const todos = await todomodel.find({
+      userId: req.userId,
+    });
+
+    res.json({
+      todos,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
+});

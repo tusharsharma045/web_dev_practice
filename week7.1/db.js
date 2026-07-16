@@ -4,13 +4,13 @@ const Schema = mongoose.Schema;
 const ObjectId = mongoose.ObjectId;
 
 
-const user = new.Schema({
+const user = new Schema({
     name : String,
     email : String,
     password : String
 });
 
-const todo = new.Schema({
+const todo = new Schema({
     title : String,
     done : Boolean,
     userId : ObjectId
