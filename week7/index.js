@@ -1,7 +1,7 @@
 const express = require('express');
 const { usermodel, todomodel } = require("./db.js");
 const app = express();
-//  monngoose.connect("");
+//  monngoose.connect("mongodb://root:example@localhost:27017/todo?authSource=admin");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = "harkirat";
 
@@ -71,9 +71,9 @@ app.post("/signin",async,function(req,res){
 
 app.post("/todo",auth,function(req,res){
     const userId = req.userId;
-    const tittle = req.body.tittle;
+    const title = req.body.title;
     todomodel.create({
-        title : tittle,
+        title : title,
         userId : userId
     });
     res.json({
