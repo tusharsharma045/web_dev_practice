@@ -5,6 +5,7 @@ const app = express();
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = "harkirat";
 
+app.use(express.json());
 
 app.post("/signup",async ,function(req,res){
 
@@ -12,13 +13,19 @@ app.post("/signup",async ,function(req,res){
     const password = req.body.password;
     const name = req.body.name;
 
-    app.use(express.json());
-
+    const hashpassword = await bcrypt.hash(password,10);
+    console.log(hashpassword);
     await usermodel.create({
         name : "harkirat",
         Email : "wwefrffgbv@gmail.com",
-        password : "123456"
+        password : "hashpassword"
     })
+    if (typeof email !== strinng || email.length <5 || !email.includes("@")) {
+        res.json({
+            message : "innvalid email"
+        })
+        
+    }
 
     res.json({
         message : "you have logged in"
@@ -32,10 +39,18 @@ app.post("/signin",async,function(req,res){
 
     const user = await usermodel.findone({
         email : email,
-        password: password
+        
     })
+    if (!user) {
+        res.status(403).json({
+            message : "user does not exist in db"
+        })
+        return
+        
+    }
+    const ispasswordvalid = await bcrypt.compare(password,user.password);
 
-    if (user) {
+    if (ispasswordvalid) {
         console.log({
             id : user._id.toString()
         });

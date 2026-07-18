@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const { usermodel, todomodel } = require("./db");
@@ -52,8 +53,21 @@ app.post("/signin", async (req, res) => {
 
     const user = await usermodel.findOne({
       email,
-      password,
     });
+
+    if (!user) {
+      return res.status(403).json({
+        message: "User not found",
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(403).json({
+        message: "Invalid credentials",
+      });
+    }
 
     if (!user) {
       return res.status(403).json({
