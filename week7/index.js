@@ -4,10 +4,23 @@ const app = express();
 //  monngoose.connect("mongodb://root:example@localhost:27017/todo?authSource=admin");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = "harkirat";
-
+const { z } = require("zod");
+const bcrypt = require("bcrypt");
 app.use(express.json());
 
 app.post("/signup",async ,function(req,res){
+    const requiredbody = z.object({
+        email : z.string().email(),
+        password : z.string().min(5).max(20),
+        name : z.string().min(3)
+    });
+const parsedbody = requiredbody.safeParse(req.body);
+if (!parsedbody.success) {
+    res.status(400).json({
+        message : "invalid body"
+    })
+    return
+}
 
     const email = req.body.email;
     const password = req.body.password;
@@ -16,9 +29,9 @@ app.post("/signup",async ,function(req,res){
     const hashpassword = await bcrypt.hash(password,10);
     console.log(hashpassword);
     await usermodel.create({
-        name : "harkirat",
-        Email : "wwefrffgbv@gmail.com",
-        password : "hashpassword"
+        name : name,
+        Email : email,
+        password : hashpassword
     })
     if (typeof email !== strinng || email.length <5 || !email.includes("@")) {
         res.json({
